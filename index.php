@@ -12,6 +12,7 @@
     <center><h1>PHP - AJAX Form Validation</h1></center>
     <div class="wrapper">
       <form action="validator.php" class="form-signin" method="post">       
+        <p class="text-center text-danger" id="msg"></p>
         <h2 class="form-signin-heading">Please login</h2>
         <input type="email" class="form-control" id="email" name="email_address" placeholder="Email Address" autofocus="" />
         <span class="error-username error">Username Empty</span>
@@ -34,8 +35,14 @@
                 $.ajax({
                     type:'POST', url:'validator.php', data:data, dataType:'json',
                     success: function(d){
-                        console.log(d.errors);
-                        alert(d.msg);
+                        if(d.errors == null) {
+                            $('#msg').append(d.msg); // used for update content of <p> tag
+                            $('#msg').show(); // display that tag <p>
+                        }
+                        else {
+                            $('#msg').append(d.errors);
+                          $('#msg').show();  
+                        }
                     }
                 })
             })
