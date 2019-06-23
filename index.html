@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AJAX PHP Form Validation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/css/style.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <div class="container wrapper">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="text-center"> AJAX & PHP Form Validation</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-offset-3 col-lg-6">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title text-center">Log In Form</h3>
+            </div>
+            <div class="panel-body">
+              <form class="form-signin" id="validatorForm" action="validationController.php" method="post">
+                <div class="form-group">
+                  <label for="email_address" class="form-input-heading">Email Address</label>
+                  <input type="text" class="form-control" id="email_address" name="email_address" placeholder="Ex: example@example.com">
+                  <span class="error-email"></span>
+                </div>
+                <div class="form-group">
+                  <label for="password" class="form-input-heading">Password</label>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="Ex: Hafr12_@">
+                  <span class="error-password"></span>
+                </div>
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-lg-offset-3 col-lg-6 text-center">
+                      <button class="btn btn-success btn-block btn-lg">Log in</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="panel-footer">
+              <div class="alert" id="message"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="assets/jquery/jquery.js" type="text/javascript"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="assets/js/validatorScript.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+          $('.error-email').hide();
+          $('.error-password').hide();
+          $('.panel-footer').hide();
+          $('#message').hide();
+
+          $('#validatorForm').submit(function (event) {
+              event.preventDefault();//stop the form to send data as default task
+
+              var error = 0;
+              var email = $('#email_address').val();
+              var password = $('#password').val();
+
+              if (email === '') {
+                  $('.error-email').text("Email Field is Empty");
+                  $('.error-email').show();
+                  error++;
+              }
+
+              if (password === '') {
+                  $('.error-password').text("Password Field is Empty");
+                  $('.error-password').show();
+                  error++;
+              }
+
+              if (error == 0) {
+                  var formData = $('#validatorForm').serialize();//copy all data from form and stor in js variable
+                  $.ajax({
+                      type: 'POST',
+                      url: 'validationController.php',
+                      data: formData,
+                      dataType: 'json',
+                      success: function (data) {
+                        console.log(data);
+                        $('.panel-footer').show();
+                          if(data.success === true) {
+                            $('#message').toggleClass("alert-success");
+                            $('#message').text(data.message);
+                            $('#message').show();
+                          }
+                          else {
+                            $('#message').addClass("alert-danger");
+                            $('#message').text(data.message);
+                            $('#message').show();
+                            
+                            if(data.errors.email_error !== null) {
+                              $('.error-email').text(data.errors.email_error);
+                              $('.error-email').show();
+                            }
+                            if(data.errors.password_error !== null) {
+                              $('.error-password').text(data.errors.password_error);
+                              $('.error-password').show();
+                            }
+                          }
+                      }
+                  });
+              }
+          });
+      });
+
+    </script>
+  </body>
+</html>
